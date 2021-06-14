@@ -1,0 +1,22 @@
+---
+title: "Modelo general para R-Markdown con Python y LaTeX"
+author: "Teodoro J. Martínez Arán"
+date: "14/6/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library (reticulate)
+library (knitr)
+library (tidyverse)
+pd <- import("pandas") # Importa la biblioteca 'Pandas' de Python
+```
+
+```{r Carga y limpieza inicial de datos}
+data_path <- c("../../../../Alacena/data/COVID19/covid_19_clean_complete.csv")
+data <- pd$read_csv(data_path)
+kable (head(data))
+
+```
+
