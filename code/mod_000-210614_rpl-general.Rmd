@@ -16,7 +16,9 @@ pd <- import("pandas") # Importa la biblioteca 'Pandas' de Python
 ```{r Carga y limpieza inicial de datos}
 data_path <- c("../../../../Alacena/data/COVID19/covid_19_clean_complete.csv")
 data <- pd$read_csv(data_path)
-kable (head(data))
+str (data)
+kable (head(data, 10))
+kable (tail(data, 10))
 
 ```
 

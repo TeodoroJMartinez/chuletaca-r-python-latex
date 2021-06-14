@@ -173,19 +173,132 @@ pre code {
 
 <pre class="r"><code>data_path &lt;- c(&quot;../../../../Alacena/data/COVID19/covid_19_clean_complete.csv&quot;)
 data &lt;- pd$read_csv(data_path)
-kable (head(data))</code></pre>
-<table style="width:100%;">
+str (data)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    49068 obs. of  10 variables:
+##  $ Province/State:List of 49068
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : chr &quot;Australian Capital Territory&quot;
+##   ..$ : chr &quot;New South Wales&quot;
+##   ..$ : chr &quot;Northern Territory&quot;
+##   ..$ : chr &quot;Queensland&quot;
+##   ..$ : chr &quot;South Australia&quot;
+##   ..$ : chr &quot;Tasmania&quot;
+##   ..$ : chr &quot;Victoria&quot;
+##   ..$ : chr &quot;Western Australia&quot;
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : chr &quot;Alberta&quot;
+##   ..$ : chr &quot;British Columbia&quot;
+##   ..$ : chr &quot;Manitoba&quot;
+##   ..$ : chr &quot;New Brunswick&quot;
+##   ..$ : chr &quot;Newfoundland and Labrador&quot;
+##   ..$ : chr &quot;Nova Scotia&quot;
+##   ..$ : chr &quot;Ontario&quot;
+##   ..$ : chr &quot;Prince Edward Island&quot;
+##   ..$ : chr &quot;Quebec&quot;
+##   ..$ : chr &quot;Saskatchewan&quot;
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : chr &quot;Anhui&quot;
+##   ..$ : chr &quot;Beijing&quot;
+##   ..$ : chr &quot;Chongqing&quot;
+##   ..$ : chr &quot;Fujian&quot;
+##   ..$ : chr &quot;Gansu&quot;
+##   ..$ : chr &quot;Guangdong&quot;
+##   ..$ : chr &quot;Guangxi&quot;
+##   ..$ : chr &quot;Guizhou&quot;
+##   ..$ : chr &quot;Hainan&quot;
+##   ..$ : chr &quot;Hebei&quot;
+##   ..$ : chr &quot;Heilongjiang&quot;
+##   ..$ : chr &quot;Henan&quot;
+##   ..$ : chr &quot;Hong Kong&quot;
+##   ..$ : chr &quot;Hubei&quot;
+##   ..$ : chr &quot;Hunan&quot;
+##   ..$ : chr &quot;Inner Mongolia&quot;
+##   ..$ : chr &quot;Jiangsu&quot;
+##   ..$ : chr &quot;Jiangxi&quot;
+##   ..$ : chr &quot;Jilin&quot;
+##   ..$ : chr &quot;Liaoning&quot;
+##   ..$ : chr &quot;Macau&quot;
+##   ..$ : chr &quot;Ningxia&quot;
+##   ..$ : chr &quot;Qinghai&quot;
+##   ..$ : chr &quot;Shaanxi&quot;
+##   ..$ : chr &quot;Shandong&quot;
+##   ..$ : chr &quot;Shanghai&quot;
+##   ..$ : chr &quot;Shanxi&quot;
+##   ..$ : chr &quot;Sichuan&quot;
+##   ..$ : chr &quot;Tianjin&quot;
+##   ..$ : chr &quot;Tibet&quot;
+##   ..$ : chr &quot;Xinjiang&quot;
+##   ..$ : chr &quot;Yunnan&quot;
+##   ..$ : chr &quot;Zhejiang&quot;
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : chr &quot;Faroe Islands&quot;
+##   ..$ : chr &quot;Greenland&quot;
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   ..$ : num NaN
+##   .. [list output truncated]
+##  $ Country/Region: chr  &quot;Afghanistan&quot; &quot;Albania&quot; &quot;Algeria&quot; &quot;Andorra&quot; ...
+##  $ Lat           : num  33.9 41.2 28 42.5 -11.2 ...
+##  $ Long          : num  67.71 20.17 1.66 1.52 17.87 ...
+##  $ Date          : chr  &quot;2020-01-22&quot; &quot;2020-01-22&quot; &quot;2020-01-22&quot; &quot;2020-01-22&quot; ...
+##  $ Confirmed     : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Deaths        : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Recovered     : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Active        : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ WHO Region    : chr  &quot;Eastern Mediterranean&quot; &quot;Europe&quot; &quot;Africa&quot; &quot;Europe&quot; ...
+##  - attr(*, &quot;pandas.index&quot;)=RangeIndex(start=0, stop=49068, step=1)</code></pre>
+<pre class="r"><code>kable (head(data, 10))</code></pre>
+<table>
 <colgroup>
-<col width="12%" />
+<col width="21%" />
+<col width="14%" />
+<col width="7%" />
+<col width="7%" />
+<col width="8%" />
+<col width="7%" />
+<col width="5%" />
+<col width="7%" />
+<col width="5%" />
 <col width="16%" />
-<col width="8%" />
-<col width="8%" />
-<col width="9%" />
-<col width="8%" />
-<col width="5%" />
-<col width="8%" />
-<col width="5%" />
-<col width="18%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -273,6 +386,217 @@ kable (head(data))</code></pre>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="left">Americas</td>
+</tr>
+<tr class="odd">
+<td align="left">NaN</td>
+<td align="left">Argentina</td>
+<td align="right">-38.41610</td>
+<td align="right">-63.61670</td>
+<td align="left">2020-01-22</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">Americas</td>
+</tr>
+<tr class="even">
+<td align="left">NaN</td>
+<td align="left">Armenia</td>
+<td align="right">40.06910</td>
+<td align="right">45.03820</td>
+<td align="left">2020-01-22</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">Europe</td>
+</tr>
+<tr class="odd">
+<td align="left">Australian Capital Territory</td>
+<td align="left">Australia</td>
+<td align="right">-35.47350</td>
+<td align="right">149.01240</td>
+<td align="left">2020-01-22</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">Western Pacific</td>
+</tr>
+<tr class="even">
+<td align="left">New South Wales</td>
+<td align="left">Australia</td>
+<td align="right">-33.86880</td>
+<td align="right">151.20930</td>
+<td align="left">2020-01-22</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">Western Pacific</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>kable (tail(data, 10))</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="4%" />
+<col width="19%" />
+<col width="15%" />
+<col width="6%" />
+<col width="6%" />
+<col width="7%" />
+<col width="6%" />
+<col width="4%" />
+<col width="6%" />
+<col width="4%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">Province/State</th>
+<th align="left">Country/Region</th>
+<th align="right">Lat</th>
+<th align="right">Long</th>
+<th align="left">Date</th>
+<th align="right">Confirmed</th>
+<th align="right">Deaths</th>
+<th align="right">Recovered</th>
+<th align="right">Active</th>
+<th align="left">WHO Region</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">49059</td>
+<td align="left">NaN</td>
+<td align="left">Malawi</td>
+<td align="right">-13.25430</td>
+<td align="right">34.30150</td>
+<td align="left">2020-07-27</td>
+<td align="right">3664</td>
+<td align="right">99</td>
+<td align="right">1645</td>
+<td align="right">1920</td>
+<td align="left">Africa</td>
+</tr>
+<tr class="even">
+<td align="left">49060</td>
+<td align="left">Falkland Islands (Malvinas)</td>
+<td align="left">United Kingdom</td>
+<td align="right">-51.79630</td>
+<td align="right">-59.52360</td>
+<td align="left">2020-07-27</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td align="right">13</td>
+<td align="right">0</td>
+<td align="left">Europe</td>
+</tr>
+<tr class="odd">
+<td align="left">49061</td>
+<td align="left">Saint Pierre and Miquelon</td>
+<td align="left">France</td>
+<td align="right">46.88520</td>
+<td align="right">-56.31590</td>
+<td align="left">2020-07-27</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="left">Europe</td>
+</tr>
+<tr class="even">
+<td align="left">49062</td>
+<td align="left">NaN</td>
+<td align="left">South Sudan</td>
+<td align="right">6.87700</td>
+<td align="right">31.30700</td>
+<td align="left">2020-07-27</td>
+<td align="right">2305</td>
+<td align="right">46</td>
+<td align="right">1175</td>
+<td align="right">1084</td>
+<td align="left">Africa</td>
+</tr>
+<tr class="odd">
+<td align="left">49063</td>
+<td align="left">NaN</td>
+<td align="left">Western Sahara</td>
+<td align="right">24.21550</td>
+<td align="right">-12.88580</td>
+<td align="left">2020-07-27</td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td align="left">Africa</td>
+</tr>
+<tr class="even">
+<td align="left">49064</td>
+<td align="left">NaN</td>
+<td align="left">Sao Tome and Principe</td>
+<td align="right">0.18640</td>
+<td align="right">6.61310</td>
+<td align="left">2020-07-27</td>
+<td align="right">865</td>
+<td align="right">14</td>
+<td align="right">734</td>
+<td align="right">117</td>
+<td align="left">Africa</td>
+</tr>
+<tr class="odd">
+<td align="left">49065</td>
+<td align="left">NaN</td>
+<td align="left">Yemen</td>
+<td align="right">15.55273</td>
+<td align="right">48.51639</td>
+<td align="left">2020-07-27</td>
+<td align="right">1691</td>
+<td align="right">483</td>
+<td align="right">833</td>
+<td align="right">375</td>
+<td align="left">Eastern Mediterranean</td>
+</tr>
+<tr class="even">
+<td align="left">49066</td>
+<td align="left">NaN</td>
+<td align="left">Comoros</td>
+<td align="right">-11.64550</td>
+<td align="right">43.33330</td>
+<td align="left">2020-07-27</td>
+<td align="right">354</td>
+<td align="right">7</td>
+<td align="right">328</td>
+<td align="right">19</td>
+<td align="left">Africa</td>
+</tr>
+<tr class="odd">
+<td align="left">49067</td>
+<td align="left">NaN</td>
+<td align="left">Tajikistan</td>
+<td align="right">38.86100</td>
+<td align="right">71.27610</td>
+<td align="left">2020-07-27</td>
+<td align="right">7235</td>
+<td align="right">60</td>
+<td align="right">6028</td>
+<td align="right">1147</td>
+<td align="left">Europe</td>
+</tr>
+<tr class="even">
+<td align="left">49068</td>
+<td align="left">NaN</td>
+<td align="left">Lesotho</td>
+<td align="right">-29.61000</td>
+<td align="right">28.23360</td>
+<td align="left">2020-07-27</td>
+<td align="right">505</td>
+<td align="right">12</td>
+<td align="right">128</td>
+<td align="right">365</td>
+<td align="left">Africa</td>
 </tr>
 </tbody>
 </table>
