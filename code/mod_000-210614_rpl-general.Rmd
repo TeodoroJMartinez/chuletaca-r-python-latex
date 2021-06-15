@@ -9,21 +9,81 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library (reticulate)
 library (knitr)
-library (tidyverse)
+library (kableExtra)
+library (tidyverse) 
+library (magrittr)  # %<>%
+
 pd <- import("pandas") # Importa la biblioteca 'Pandas' de Python
 np <- import("numpy") # Importa la biblioteca 'Numpy' de Python
 
 ```
 
+## Fuentes de los datos
+Los datos de este documento provienen de la compilación hecha por usuarios de [Kaggle](https://www.kaggle.com/imdevskp/corona-virus-report). Los datos corresponden a la versión 166, a fecha 15-Jun-2021.
+
+## Carga y limpieza inicial de los datos
+
 ```{r Carga y limpieza inicial de datos}
 data_path <- c("../../../../Alacena/data/COVID19/covid_19_clean_complete.csv")
-data <- pd$read_csv(data_path)
-str (data)
-kable (head(data, 10))
-kable (tail(data, 10))
-
-data2 <- read_csv (data_path)
-str (data2)
+data <- read_csv (data_path,
+                  skip = 1,
+                  col_names = c ("Provincia_Estado",
+                                 "Pais_Region",
+                                 "Latitud", # Norte(+) o Sur (-)
+                                 "Longitud", # Este (+) u Oeste (-)
+                                 "Fecha",
+                                 "Casos_Confirmados",
+                                 "Casos_Fallecidos",
+                                 "Casos_Recuperados",
+                                 "Casos_Activos",
+                                 "Region_OMS"
+                                 ),
+                  col_types = c (Provincia_Estado = "f",
+                                 Pais_Region = "f",
+                                 Latitud = "n",
+                                 Longitud = "n",
+                                 Fecha = "D",
+                                 Casos_Confirmados = "i",
+                                 Casos_Fallecidos = "i",
+                                 Casos_Recuperados = "i",
+                                 Casos_Activos = "i",
+                                 Region_OMS = "f"
+                                 )
+                  )
 
 ```
+## Estructura de los datos
 
+```{r Estructura de los datos}
+data |> head(10) |> kable() |> kable_styling()
+
+```
+## Auditoría de valores anómalos
+
+Para auditar la calidad de los valores, se pueden crear columnas calculadas a partir de los datos, que generen valores aparentemente lógicos. Si aparecen valores imposibles, alguno de los datos que participan en el cálculo contiene un error.
+
+Como ejemplo, utilizaremos una columna calculada para los pacientes activos. Para todas las filas, debe cumplirse la siguiente igualdad:
+
+$$ Confirmados = Muertos + Recuperados + Activos $$
+Por tanto, los casos activos calculados podrían obtenerse mediante la siguiente operación:
+
+$$ Activos = Confirmados - Fallecidos - Recuperados $$
+Podemos insertar la columna calculada mediante el código siguiente:
+```{r}
+data %<>%
+  mutate (Casos_Activos_calc = Casos_Confirmados - Casos_Fallecidos - Casos_Recuperados)
+data |> tail()
+```
+
+Los casos activos no deberían ser negativos, salvo que haya un error o alguna explicación no lógica. Por tanto, cuando filtramos los datos en los que la nueva columna ofrezca datos negativos, obtendremos aquellas filas con incongruencias de datos.
+
+```{r}
+data |>
+  filter (Casos_Activos_calc < 0) |>
+  arrange(Provincia_Estado, Fecha) |>
+  kable() |> 
+  kable_styling()
+```
+Con estos datos anómalos identificados hay dos estrategias posibles:
+1.- Si se conoce el origen de la anomalía, se puede corregir el dato erróneo
+2.- Si no se conoce el origen, deben documentarse y tratarse de manera específica
