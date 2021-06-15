@@ -175,6 +175,7 @@ pre code {
 
 <div id="fuentes-de-los-datos" class="section level2">
 <h2>Fuentes de los datos</h2>
+<p>La estructura y parte de los contenidos de este modelo derivan del <a href="https://www.udemy.com/course/covid19-r/">curso de Udemy de Juan Gabriel Gomila Salas para análisis de datos del Coronavirus</a></p>
 <p>Los datos de este documento provienen de la compilación hecha por usuarios de <a href="https://www.kaggle.com/imdevskp/corona-virus-report">Kaggle</a>. Los datos corresponden a la versión 166, a fecha 15-Jun-2021.</p>
 </div>
 <div id="carga-y-limpieza-inicial-de-los-datos" class="section level2">
@@ -1265,6 +1266,65 @@ Africa
 </tr>
 </tbody>
 </table>
+<p>Con estos datos anómalos identificados hay dos estrategias posibles: 1.- Si se conoce el origen de la anomalía, se puede corregir el dato erróneo 2.- Si no se conoce el origen, deben documentarse y tratarse de manera específica</p>
+</div>
+<div id="análisis-geográfico" class="section level2">
+<h2>Análisis geográfico</h2>
+<p>En primer lugar, debemos filtrar los datos geográficos que nos interesan.</p>
+<p>En el caso de tablas de datos con longitud y latitud, podemos crear inicialmente un rectángulo que encuadre los países de interés.</p>
+<p>En un segundo paso, eliminaremos aquellos países en los que no tenemos observaciones</p>
+<pre class="r"><code>data_europa &lt;- data |&gt;
+  filter (Latitud &gt;38,
+          between(Longitud, -25, 30)
+          )
+nrow (data_europa)</code></pre>
+<pre><code>## [1] 8460</code></pre>
+<pre class="r"><code>table(data_europa$Pais_Region) |&gt;
+  as.data.frame() |&gt;
+  filter(Freq &gt;0)</code></pre>
+<pre><code>##                      Var1 Freq
+## 1                 Albania  188
+## 2                 Andorra  188
+## 3                 Austria  188
+## 4                 Belarus  188
+## 5                 Belgium  188
+## 6  Bosnia and Herzegovina  188
+## 7                Bulgaria  188
+## 8                 Croatia  188
+## 9                 Czechia  188
+## 10                Denmark  376
+## 11                Estonia  188
+## 12                Finland  188
+## 13                 France  188
+## 14                Germany  188
+## 15                 Greece  188
+## 16               Holy See  188
+## 17                Hungary  188
+## 18                Iceland  188
+## 19                Ireland  188
+## 20                  Italy  188
+## 21                 Latvia  188
+## 22          Liechtenstein  188
+## 23              Lithuania  188
+## 24             Luxembourg  188
+## 25                Moldova  188
+## 26                 Monaco  188
+## 27             Montenegro  188
+## 28            Netherlands  188
+## 29        North Macedonia  188
+## 30                 Norway  188
+## 31                 Poland  188
+## 32               Portugal  188
+## 33                Romania  188
+## 34             San Marino  188
+## 35                 Serbia  188
+## 36               Slovakia  188
+## 37               Slovenia  188
+## 38                  Spain  188
+## 39                 Sweden  188
+## 40            Switzerland  188
+## 41         United Kingdom  564
+## 42                 Kosovo  188</code></pre>
 </div>
 
 

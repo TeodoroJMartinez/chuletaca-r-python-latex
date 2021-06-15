@@ -19,7 +19,10 @@ np <- import("numpy") # Importa la biblioteca 'Numpy' de Python
 ```
 
 ## Fuentes de los datos
+La estructura y parte de los contenidos de este modelo derivan del [curso de Udemy de Juan Gabriel Gomila Salas para análisis de datos del Coronavirus](https://www.udemy.com/course/covid19-r/)
+
 Los datos de este documento provienen de la compilación hecha por usuarios de [Kaggle](https://www.kaggle.com/imdevskp/corona-virus-report). Los datos corresponden a la versión 166, a fecha 15-Jun-2021.
+
 
 ## Carga y limpieza inicial de los datos
 
@@ -83,7 +86,29 @@ data |>
   arrange(Provincia_Estado, Fecha) |>
   kable() |> 
   kable_styling()
+
 ```
 Con estos datos anómalos identificados hay dos estrategias posibles:
 1.- Si se conoce el origen de la anomalía, se puede corregir el dato erróneo
 2.- Si no se conoce el origen, deben documentarse y tratarse de manera específica
+
+## Análisis geográfico
+
+En primer lugar, debemos filtrar los datos geográficos que nos interesan.
+
+En el caso de tablas de datos con longitud y latitud, podemos crear inicialmente un rectángulo que encuadre los países de interés.
+
+En un segundo paso, eliminaremos aquellos países en los que no tenemos observaciones
+
+```{r}
+data_europa <- data |>
+  filter (Latitud >38,
+          between(Longitud, -25, 30)
+          )
+nrow (data_europa)
+table(data_europa$Pais_Region) |>
+  as.data.frame() |>
+  filter(Freq >0)
+  
+```
+
