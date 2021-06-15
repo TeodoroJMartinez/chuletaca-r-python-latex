@@ -10,7 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library (reticulate)
 library (knitr)
 library (kableExtra)
-library (tidyverse) 
+library (tidyverse)
+library (lubridate)
 library (magrittr)  # %<>%
 
 pd <- import("pandas") # Importa la biblioteca 'Pandas' de Python
@@ -18,13 +19,13 @@ np <- import("numpy") # Importa la biblioteca 'Numpy' de Python
 
 ```
 
-## Fuentes de los datos
+# Fuentes de los datos
 La estructura y parte de los contenidos de este modelo derivan del [curso de Udemy de Juan Gabriel Gomila Salas para análisis de datos del Coronavirus](https://www.udemy.com/course/covid19-r/)
 
 Los datos de este documento provienen de la compilación hecha por usuarios de [Kaggle](https://www.kaggle.com/imdevskp/corona-virus-report). Los datos corresponden a la versión 166, a fecha 15-Jun-2021.
 
 
-## Carga y limpieza inicial de los datos
+# Carga y limpieza inicial de los datos
 
 ```{r Carga y limpieza inicial de datos}
 data_path <- c("../../../../Alacena/data/COVID19/covid_19_clean_complete.csv")
@@ -92,7 +93,9 @@ Con estos datos anómalos identificados hay dos estrategias posibles:
 1.- Si se conoce el origen de la anomalía, se puede corregir el dato erróneo
 2.- Si no se conoce el origen, deben documentarse y tratarse de manera específica
 
-## Análisis geográfico
+# Análisis geográfico
+
+## Delimitación de zonas geográficas amplias (rectángulos)
 
 En primer lugar, debemos filtrar los datos geográficos que nos interesan.
 
@@ -111,4 +114,54 @@ table(data_europa$Pais_Region) |>
   filter(Freq >0)
   
 ```
+## Filtrado de datos geográficos por radio (bolas)
 
+Para saber los datos que están en torno a un determinado radio, a partir de un punto central, utilizaremos la distancia euclídea. Se calcula mediante la siguiente fórmula:
+
+$$ d(x,y) = \sqrt {(x_{Lat}-y_{Lat})^2+ (x_{Long}-y_{Long})^2} $$
+Definiremos una función 'distancia_grados', que calcule la fórmula:
+```{r}
+distancia_grados <- function (x,y){
+  sqrt((x[1]-y[1])^2 + (x[2]-y[2])^2)
+}
+```
+
+Y en segundo lugar, crearemos una función que calcule la distancia a una determinada localización, como por ejemplo 'distancia_grados_HCN'
+
+```{r}
+distancia_grados_hcn <- function (x){
+  hcn <- c (38.104333, -1.867359)
+  distancia_grados (x, hcn)
+}
+```
+De este modo, podemos saber los distancia de los casos respecto al centro definido, aplicando esta función:
+
+```{r}
+distancia_hcn <- apply(cbind(data_europa$Latitud, data_europa$Longitud),
+                       MARGIN = 1,
+                       FUN = distancia_grados_hcn
+                       )
+```
+Si añadimos la columna creada a los datos de Europa, obtendremos la distancia de los casos al HCN de todos los casos
+
+```{r}
+data_europa %<>%
+  mutate (
+    distancia_hcn = distancia_hcn
+  )
+
+```
+Para identificar si hemos tenido muchos casos cerca del hcn en una determinada fecha, podríamos filtrar los casos:
+
+```{r}
+data_europa |>
+  filter (between (Fecha,
+                   dmy("01-03-2020"), 
+                   dmy("17-03-2020")
+                   ),
+         distancia_hcn < 4
+         ) |>
+  kable ()
+```
+
+Los datos agregados geolocalizan falsamente los datos en un punto que se considera el centro de masas (todos los datos son iguales. Si esta función se aplica al dataset de datos crudos, podemos geolocalizar cómo se propagan las epidemias en tiempo real.

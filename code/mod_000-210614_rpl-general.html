@@ -173,13 +173,13 @@ pre code {
 </div>
 
 
-<div id="fuentes-de-los-datos" class="section level2">
-<h2>Fuentes de los datos</h2>
+<div id="fuentes-de-los-datos" class="section level1">
+<h1>Fuentes de los datos</h1>
 <p>La estructura y parte de los contenidos de este modelo derivan del <a href="https://www.udemy.com/course/covid19-r/">curso de Udemy de Juan Gabriel Gomila Salas para análisis de datos del Coronavirus</a></p>
 <p>Los datos de este documento provienen de la compilación hecha por usuarios de <a href="https://www.kaggle.com/imdevskp/corona-virus-report">Kaggle</a>. Los datos corresponden a la versión 166, a fecha 15-Jun-2021.</p>
 </div>
-<div id="carga-y-limpieza-inicial-de-los-datos" class="section level2">
-<h2>Carga y limpieza inicial de los datos</h2>
+<div id="carga-y-limpieza-inicial-de-los-datos" class="section level1">
+<h1>Carga y limpieza inicial de los datos</h1>
 <pre class="r"><code>data_path &lt;- c(&quot;../../../../Alacena/data/COVID19/covid_19_clean_complete.csv&quot;)
 data &lt;- read_csv (data_path,
                   skip = 1,
@@ -206,7 +206,6 @@ data &lt;- read_csv (data_path,
                                  Region_OMS = &quot;f&quot;
                                  )
                   )</code></pre>
-</div>
 <div id="estructura-de-los-datos" class="section level2">
 <h2>Estructura de los datos</h2>
 <pre class="r"><code>data |&gt; head(10) |&gt; kable() |&gt; kable_styling()</code></pre>
@@ -1268,8 +1267,11 @@ Africa
 </table>
 <p>Con estos datos anómalos identificados hay dos estrategias posibles: 1.- Si se conoce el origen de la anomalía, se puede corregir el dato erróneo 2.- Si no se conoce el origen, deben documentarse y tratarse de manera específica</p>
 </div>
-<div id="análisis-geográfico" class="section level2">
-<h2>Análisis geográfico</h2>
+</div>
+<div id="análisis-geográfico" class="section level1">
+<h1>Análisis geográfico</h1>
+<div id="delimitación-de-zonas-geográficas-amplias-rectángulos" class="section level2">
+<h2>Delimitación de zonas geográficas amplias (rectángulos)</h2>
 <p>En primer lugar, debemos filtrar los datos geográficos que nos interesan.</p>
 <p>En el caso de tablas de datos con longitud y latitud, podemos crear inicialmente un rectángulo que encuadre los países de interés.</p>
 <p>En un segundo paso, eliminaremos aquellos países en los que no tenemos observaciones</p>
@@ -1325,6 +1327,85 @@ nrow (data_europa)</code></pre>
 ## 40            Switzerland  188
 ## 41         United Kingdom  564
 ## 42                 Kosovo  188</code></pre>
+</div>
+<div id="filtrado-de-datos-geográficos-por-radio-bolas" class="section level2">
+<h2>Filtrado de datos geográficos por radio (bolas)</h2>
+<p>Para saber los datos que están en torno a un determinado radio, a partir de un punto central, utilizaremos la distancia euclídea. Se calcula mediante la siguiente fórmula:</p>
+<p><span class="math display">\[ d(x,y) = \sqrt {(x_{Lat}-y_{Lat})^2+ (x_{Long}-y_{Long})^2} \]</span> Definiremos una función ‘distancia_grados’, que calcule la fórmula:</p>
+<pre class="r"><code>distancia_grados &lt;- function (x,y){
+  sqrt((x[1]-y[1])^2 + (x[2]-y[2])^2)
+}</code></pre>
+<p>Y en segundo lugar, crearemos una función que calcule la distancia a una determinada localización, como por ejemplo ‘distancia_grados_HCN’</p>
+<pre class="r"><code>distancia_grados_hcn &lt;- function (x){
+  hcn &lt;- c (38.104333, -1.867359)
+  distancia_grados (x, hcn)
+}</code></pre>
+<p>De este modo, podemos saber los distancia de los casos respecto al centro definido, aplicando esta función:</p>
+<pre class="r"><code>distancia_hcn &lt;- apply(cbind(data_europa$Latitud, data_europa$Longitud),
+                       MARGIN = 1,
+                       FUN = distancia_grados_hcn
+                       )</code></pre>
+<p>Si añadimos la columna creada a los datos de Europa, obtendremos la distancia de los casos al HCN de todos los casos</p>
+<pre class="r"><code>data_europa %&lt;&gt;%
+  mutate (
+    distancia_hcn = distancia_hcn
+  )</code></pre>
+<p>Para identificar si hemos tenido muchos casos cerca del hcn en una determinada fecha, podemos filtrar los casos:</p>
+<pre class="r"><code>data_europa |&gt;
+  filter (between (Fecha,
+                   dmy(&quot;01-03-2020&quot;), 
+                   dmy(&quot;17-03-2020&quot;)
+                   ),
+         distancia_hcn &lt; 1
+         ) |&gt;
+  kable ()</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Provincia_Estado
+</th>
+<th style="text-align:left;">
+Pais_Region
+</th>
+<th style="text-align:right;">
+Latitud
+</th>
+<th style="text-align:right;">
+Longitud
+</th>
+<th style="text-align:left;">
+Fecha
+</th>
+<th style="text-align:right;">
+Casos_Confirmados
+</th>
+<th style="text-align:right;">
+Casos_Fallecidos
+</th>
+<th style="text-align:right;">
+Casos_Recuperados
+</th>
+<th style="text-align:right;">
+Casos_Activos
+</th>
+<th style="text-align:left;">
+Region_OMS
+</th>
+<th style="text-align:right;">
+Casos_Activos_calc
+</th>
+<th style="text-align:right;">
+distancia_hcn
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 
