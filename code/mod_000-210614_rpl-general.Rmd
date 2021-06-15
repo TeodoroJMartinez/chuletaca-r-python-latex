@@ -11,6 +11,8 @@ library (reticulate)
 library (knitr)
 library (tidyverse)
 pd <- import("pandas") # Importa la biblioteca 'Pandas' de Python
+np <- import("numpy") # Importa la biblioteca 'Numpy' de Python
+
 ```
 
 ```{r Carga y limpieza inicial de datos}
@@ -19,6 +21,9 @@ data <- pd$read_csv(data_path)
 str (data)
 kable (head(data, 10))
 kable (tail(data, 10))
+
+data2 <- read_csv (data_path)
+str (data2)
 
 ```
 

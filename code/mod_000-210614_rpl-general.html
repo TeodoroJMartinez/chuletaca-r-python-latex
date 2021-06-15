@@ -600,6 +600,46 @@ str (data)</code></pre>
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>data2 &lt;- read_csv (data_path)</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   `Province/State` = col_character(),
+##   `Country/Region` = col_character(),
+##   Lat = col_double(),
+##   Long = col_double(),
+##   Date = col_date(format = &quot;&quot;),
+##   Confirmed = col_double(),
+##   Deaths = col_double(),
+##   Recovered = col_double(),
+##   Active = col_double(),
+##   `WHO Region` = col_character()
+## )</code></pre>
+<pre class="r"><code>str (data2)</code></pre>
+<pre><code>## spec_tbl_df [49,068 x 10] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+##  $ Province/State: chr [1:49068] NA NA NA NA ...
+##  $ Country/Region: chr [1:49068] &quot;Afghanistan&quot; &quot;Albania&quot; &quot;Algeria&quot; &quot;Andorra&quot; ...
+##  $ Lat           : num [1:49068] 33.9 41.2 28 42.5 -11.2 ...
+##  $ Long          : num [1:49068] 67.71 20.17 1.66 1.52 17.87 ...
+##  $ Date          : Date[1:49068], format: &quot;2020-01-22&quot; &quot;2020-01-22&quot; ...
+##  $ Confirmed     : num [1:49068] 0 0 0 0 0 0 0 0 0 0 ...
+##  $ Deaths        : num [1:49068] 0 0 0 0 0 0 0 0 0 0 ...
+##  $ Recovered     : num [1:49068] 0 0 0 0 0 0 0 0 0 0 ...
+##  $ Active        : num [1:49068] 0 0 0 0 0 0 0 0 0 0 ...
+##  $ WHO Region    : chr [1:49068] &quot;Eastern Mediterranean&quot; &quot;Europe&quot; &quot;Africa&quot; &quot;Europe&quot; ...
+##  - attr(*, &quot;spec&quot;)=
+##   .. cols(
+##   ..   `Province/State` = col_character(),
+##   ..   `Country/Region` = col_character(),
+##   ..   Lat = col_double(),
+##   ..   Long = col_double(),
+##   ..   Date = col_date(format = &quot;&quot;),
+##   ..   Confirmed = col_double(),
+##   ..   Deaths = col_double(),
+##   ..   Recovered = col_double(),
+##   ..   Active = col_double(),
+##   ..   `WHO Region` = col_character()
+##   .. )</code></pre>
 
 
 
