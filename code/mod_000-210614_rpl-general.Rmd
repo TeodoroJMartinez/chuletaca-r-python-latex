@@ -2,7 +2,12 @@
 title: "Modelo general para R-Markdown con Python y LaTeX"
 author: "Teodoro J. Martínez Arán"
 date: "14/6/2021"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
@@ -13,9 +18,6 @@ library (kableExtra)
 library (tidyverse)
 library (lubridate)
 library (magrittr)  # %<>%
-
-pd <- import("pandas") # Importa la biblioteca 'Pandas' de Python
-np <- import("numpy") # Importa la biblioteca 'Numpy' de Python
 
 ```
 
@@ -59,7 +61,10 @@ data <- read_csv (data_path,
 ## Estructura de los datos
 
 ```{r Estructura de los datos}
-data |> head(10) |> kable() |> kable_styling()
+data |> 
+  head(10) |> 
+  kable() |> 
+  kable_styling()
 
 ```
 ## Auditoría de valores anómalos
