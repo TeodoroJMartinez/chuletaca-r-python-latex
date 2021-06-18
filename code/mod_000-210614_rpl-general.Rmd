@@ -18,18 +18,20 @@ library (kableExtra)
 library (tidyverse)
 library (lubridate)
 library (magrittr)  # %<>%
+library (rnaturalearth)
 
 ```
 
-# Fuentes de los datos
-La estructura y parte de los contenidos de este modelo derivan del [curso de Udemy de Juan Gabriel Gomila Salas para análisis de datos del Coronavirus](https://www.udemy.com/course/covid19-r/)
+# Carga, limpieza y manipulación inicial de datos
 
+## Crédito a los autores del dataset y el curso de análisis de datos COVID
 Los datos de este documento provienen de la compilación hecha por usuarios de [Kaggle](https://www.kaggle.com/imdevskp/corona-virus-report). Los datos corresponden a la versión 166, a fecha 15-Jun-2021.
 
+La estructura y parte de los contenidos de este modelo derivan del [curso de Udemy de Juan Gabriel Gomila Salas para análisis de datos del Coronavirus](https://www.udemy.com/course/covid19-r/)
 
-# Carga y limpieza inicial de los datos
+## Carga de datos
 
-```{r Carga y limpieza inicial de datos}
+```{r Carga, limpieza y manipulación inicial de datos}
 data_path <- c("../../../../Alacena/data/COVID19/covid_19_clean_complete.csv")
 data <- read_csv (data_path,
                   skip = 1,
@@ -98,9 +100,9 @@ Con estos datos anómalos identificados hay dos estrategias posibles:
 1.- Si se conoce el origen de la anomalía, se puede corregir el dato erróneo
 2.- Si no se conoce el origen, deben documentarse y tratarse de manera específica
 
-# Análisis geográfico
+# Análisis geográfico de datos
 
-## Delimitación de zonas geográficas amplias (rectángulos)
+## Delimitación de zonas geográficas groseras (rectángulos)
 
 En primer lugar, debemos filtrar los datos geográficos que nos interesan.
 
@@ -119,7 +121,7 @@ table(data_europa$Pais_Region) |>
   filter(Freq >0)
   
 ```
-## Filtrado de datos geográficos por radio (bolas)
+## Delimitación de zonas geográficas en torno a un punto (bolas)
 
 Para saber los datos que están en torno a un determinado radio, a partir de un punto central, utilizaremos la distancia euclídea. Se calcula mediante la siguiente fórmula:
 
@@ -170,3 +172,32 @@ data_europa |>
 ```
 
 Los datos agregados geolocalizan falsamente los datos en un punto que se considera el centro de masas (todos los datos son iguales. Si esta función se aplica al dataset de datos crudos, podemos geolocalizar cómo se propagan las epidemias en tiempo real.
+
+## Mapas del mundo (ggmaps)
+Los datos del mundo los podemos descargar de la biblioteca Rnaturalearth
+
+```{r}
+world <- ne_countries(scale="large",
+                      returnclass ="sf")
+ggplot (data = world) + 
+  geom_sf(color = "black", aes(fill = mapcolor13))+
+  xlab("Longitud") + 
+  ylab("Latitud") +
+  ggtitle ("Mapa del mundo", subtitle = "COVID-19")
+
+```
+
+
+
+# Análisis temporal de los datos
+
+# Análisis por cohortes
+
+# Análisis predictivo
+
+# Fuentes oficiales de datos
+
+# Modelos matemáticos para el estudio de series temporales
+
+# Elaboración de informes interactivos
+
