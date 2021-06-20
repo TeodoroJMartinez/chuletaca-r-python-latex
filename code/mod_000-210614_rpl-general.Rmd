@@ -19,7 +19,9 @@ library (tidyverse)
 library (lubridate)
 library (magrittr)  # %<>%
 library (rnaturalearth)
-
+library (plotly)
+library (xts)
+library (dygraphs)
 ```
 
 # Carga, limpieza y manipulación inicial de datos
@@ -176,20 +178,275 @@ Los datos agregados geolocalizan falsamente los datos en un punto que se conside
 ## Mapas del mundo (ggmaps)
 Los datos del mundo los podemos descargar de la biblioteca Rnaturalearth
 
+### Definición del mapa mundo genérico
+
+Para crear un mapa se necesita un dataset que contenga los datos de los bordes de los países para poder pintarlo
+
+Uno de los formatos más utilizados son los archivos de tipo 'shapefile' o 'sf'.
+
 ```{r}
 world <- ne_countries(scale="large",
                       returnclass ="sf")
+
+# Definición de las variables necesarias para pintar el mapa genérico
+datos_mapa <- world
+color_fronteras <- "black"
+color_paises <- "#A51C30"
+labs_title <- c("Mapa del mundo")
+labs_subtitle <- c("genérico")
+
+# Mapa del mundo
 ggplot (data = world) + 
-  geom_sf(color = "black", aes(fill = mapcolor13))+
+  geom_sf(color = color_fronteras, 
+          aes(fill = color_paises)
+          )+
   xlab("Longitud") + 
   ylab("Latitud") +
-  ggtitle ("Mapa del mundo", subtitle = "COVID-19")
+  ggtitle (labs_title, 
+           subtitle = labs_subtitle)
+```
 
+## Mapa con proyecciones diferentes
+Se puede cambiar la proyección del mapa para utilizar otra representación diferente, distinta a Mercator.
+
+```{r}
+# Mapa del mundo
+ggplot (data = world) + 
+  geom_sf(color = color_fronteras, 
+          aes(fill = color_paises)
+          ) +
+  coord_sf (crs="+proj=laea + lat_0=50 + lon_0=10") + # Tipo de proyección, latitud-longitud del centro del mapa
+  xlab("Longitud") + 
+  ylab("Latitud") +
+  ggtitle (labs_title, 
+           subtitle = labs_subtitle)
 ```
 
 
 
+## Mapa con distintos colores según un parámetro
+Se puede asignar una variable al color de los países, que quedarán coloreados según una escala de color que abarque el rango de valores de esta variable. Por defecto se añade una leyenda explicativa.
+
+```{r}
+# Definición de las variables necesarias para pintar el mapa con color por un variable
+color_paises <- world$mapcolor9
+labs_title <- c("Mapa del mundo")
+labs_subtitle <- c("Color de países en función de una variable")
+
+# Mapa del mundo coloreado
+ggplot (data = world) + 
+  geom_sf(color = color_fronteras, 
+          aes(fill = color_paises)
+          )+
+  xlab("Longitud") + 
+  ylab("Latitud") +
+  ggtitle (labs_title, 
+           subtitle = labs_subtitle)
+```
+
+## Mapa con puntos proporcionales a un parámetro
+Se puede asignar una variable a un gráfico de puntos geolocalizado en el centro de cada país, con tamaño proporcional al valor de una variable.
+
+```{r}
+# Definición de las variables necesarias para pintar el mapa con un punto proporcional a un variable
+labs_title <- c("Mapa del mundo")
+labs_subtitle <- c("Color de países en función de una variable")
+
+# Mapa del mundo con punto proporcional
+## Primera capa: mapa del mundo vacío, sin colores, sólo con las fronteras
+ggplot (data = world) + 
+  geom_sf(color = color_fronteras)+
+  xlab("Longitud") + 
+  ylab("Latitud") +
+  ggtitle (labs_title, 
+           subtitle = labs_subtitle)
+## segunda capa: punto proporcional a la variable
+data |>
+  filter(data$Fecha == dmy ("19-03-2020")) |>
+  ggplot(aes(Longitud, Latitud)) +
+  geom_point(aes(size = Casos_Confirmados,
+                 color = Casos_Fallecidos))+
+  coord_fixed() +
+  theme(legend.position = "bottom")
+```
+
+## Mapas interactivos con ggplotly
+La librería añade interactividad con un mapa previamente creado. La forma más sencilla de gestionarlo es asignar el mapa a una variable, y parametrizar ggplot por separado
+
+```{r}
+g <- ggplot (data = world) + 
+  geom_sf(color = color_fronteras, 
+          aes(fill = color_paises)
+          ) +
+  xlab("Longitud") + 
+  ylab("Latitud") +
+  ggtitle (labs_title, 
+           subtitle = labs_subtitle)
+ggplotly(g)
+```
+## Cómo hacer un top 20
+
+Seleccionamos los datos
+```{r}
+thr = 1000
+
+data |>
+  filter (Fecha == ymd("2020-03-19"),
+          Casos_Confirmados > thr) |>
+  mutate (Prop_Fallecidos = Casos_Fallecidos / Casos_Confirmados,
+          Ranking = dense_rank(desc(Prop_Fallecidos))) |>
+  arrange (Ranking) |>
+  head (20) |>
+  kable ()
+```
+## Segmentación de datos de las regiones por categorías con mosaicplot
+
+```{r}
+data$lat_class = cut(data$Latitud,
+                     breaks = seq(from = -90, to =90, by = 10))
+data$long_class = cut(data$Longitud,
+                      breaks = seq(from = -180, to =180, by = 10))
+tt = table (data$lat_class, data$long_class)
+tt = tt[nrow(tt):1, ]
+mosaicplot (t(tt), shade = TRUE)
+```
+
 # Análisis temporal de los datos
+
+## Evolución de infectados vs recuperados vs fallecidos
+
+En primer lugar, debe crearse una tabla en la que se incluyan los datos que se quieren representar
+
+```{r}
+datos_por_fecha = aggregate(
+  cbind(Casos_Confirmados, Casos_Fallecidos, Casos_Recuperados) ~ Fecha,
+  data=data,
+  FUN = sum
+) 
+datos_por_fecha$Casos_Activos <-
+  datos_por_fecha$Casos_Confirmados - datos_por_fecha$Casos_Fallecidos - datos_por_fecha$Casos_Recuperados
+head(datos_por_fecha)
+tail(datos_por_fecha)
+
+```
+### Gráficos con el paquete stats
+Se pueden pintar los gráficos con el paquete básico 'stats' incluido en R
+
+```{r}
+barplot(Casos_Confirmados ~ Fecha, data = datos_por_fecha)
+barplot(Casos_Fallecidos ~ Fecha, data = datos_por_fecha)
+barplot(Casos_Recuperados ~ Fecha, data = datos_por_fecha)
+barplot(Casos_Activos ~ Fecha, data = datos_por_fecha)
+
+plot (Casos_Confirmados ~ Fecha, 
+      data = datos_por_fecha,
+      col = "orange",
+      type = "l",
+      main = "Casos COVID-19 confirmados en todo el mundo por fecha",
+      xlab = "Fecha",
+      ylab = "Número de casos COVID-19 confirmados",
+      log = "y")
+lines (Casos_Fallecidos ~ Fecha,
+       data = datos_por_fecha,
+       col = "red")
+lines (Casos_Recuperados ~ Fecha,
+       data = datos_por_fecha,
+       col = "green")
+legend ("topleft", 
+        c("Confirmados", "Fallecidos", "Recuperados"),
+        col = c("orange", "red", "green"),
+        pch = 1,
+        lwd = 2)
+```
+
+### Gráficos con el paquete ggplot2
+
+Los gráficos también se pueden dibujar con ggplot2
+
+```{r}
+
+```
+
+## Análisis de datos de España
+
+En primer lugar, deben filtrarse los datos del país que queremos estudiar, y las variables sobre las que se van a trabajar.
+
+```{r}
+data_spain = data |>
+  filter(Pais_Region == "Spain") |>
+  select(Fecha, starts_with("Casos_"))
+
+plot (x = data_spain$Fecha,
+      y = data_spain$Casos_Confirmados,
+      main = "Casos COVID-19 confirmados en España",
+      type = "s",
+      col = "orange",
+      lwd = 2
+      )
+barplot (as.matrix (t (data_spain[,3:5])),
+         names = datos_por_fecha$Fecha,
+         col = c("red","green","yellow"),
+         main = "Estudio de casos por tipo en España",
+         xlab = "Fecha",
+         ylab = "Número de casos"
+         )
+legend ("topleft", 
+        c ("Fallecidos", "Recuperados", "Activos"),
+        col = c("red","green","yellow"),
+        pch = 1,
+        lwd = 2)
+```
+
+## Gráficos interactivos con series temporales
+
+Se utilizarán dos librerías específicas para series temporales: xts y dygraphs
+
+Reutilizaremos uno de los gráficos previos, y le daremos interactividad
+
+```{r}
+# Gráfico base
+plot (Casos_Confirmados ~ Fecha, 
+      data = datos_por_fecha,
+      col = "orange",
+      type = "l",
+      main = "Casos COVID-19 confirmados en todo el mundo por fecha",
+      xlab = "Fecha",
+      ylab = "Número de casos COVID-19 confirmados",
+      log = "y")
+lines (Casos_Fallecidos ~ Fecha,
+       data = datos_por_fecha,
+       col = "red")
+lines (Casos_Recuperados ~ Fecha,
+       data = datos_por_fecha,
+       col = "green")
+legend ("topleft", 
+        c("Confirmados", "Fallecidos", "Recuperados"),
+        col = c("orange", "red", "green"),
+        pch = 1,
+        lwd = 2)
+
+# Creación del objeto ts
+datos_por_fecha_ts <- xts (x = datos_por_fecha[, 2:5], # Datos que queremos incluir
+                           order.by = datos_por_fecha$Fecha)    # 
+
+# Pintamos el primer tipo de gráfico dygraph (elemental)
+dygraph (datos_por_fecha_ts) |>
+  dyOptions(labelsUTC = TRUE,
+            labelsKMB = TRUE,
+            fillGraph = TRUE,
+            fillAlpha = 0.05,
+            drawGrid = TRUE,
+            colors = c("blue", "red", "green", "orange")
+            ) |>
+  dyRangeSelector() |>
+  dyCrosshair (direction = "vertical") |>
+  dyHighlight (highlightCircleSize = 5,
+               highlightSeriesBackgroundAlpha = 0.2,
+               hideOnMouseOut = FALSE) |>
+  dyRoller (rollPeriod = 2)
+
+```
+
 
 # Análisis por cohortes
 
